@@ -123,40 +123,53 @@ export default function HybridNameFinder() {
     }, 1000)
   }
 
-  const generateResult = () => {
-    // In a real app, this would call an API to get name recommendations
-    // For demo purposes, we'll just set some sample data
-    const names = {
-      male: ["Ethan", "Noah", "Liam", "Mason", "Oliver"],
-      female: ["Emma", "Olivia", "Ava", "Sophia", "Isabella"],
-      neutral: ["Jordan", "Riley", "Taylor", "Alex", "Morgan"],
-    }
+  const generateResult = async () => {
+    try {
+      // 만약 서버가 http://localhost:8080/api/chat/generate 에서 받는다면:
+      const response = await fetch("http://localhost:8080/api/chat/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          age: formData.age,
+          gender: formData.gender,
+          mbti: formData.mbti,
+          job: formData.job,
+          uniqueness: formData.uniqueness,
+        }),
+      })
 
-    const randomIndex = Math.floor(Math.random() * 5)
-    const gender = formData.gender || "neutral"
-    const name = names[gender as keyof typeof names][randomIndex]
+      if (!response.ok) {
+        throw new Error("서버 응답 에러")
+      }
 
-    const explanations = [
-      `${name}은(는) 당신의 창의적인 정신과 삶에 대한 독특한 관점을 반영합니다.`,
-      `${name}은(는) 자신감과 군중 속에서 돋보이는 능력을 나타냅니다.`,
-      `${name}은(는) 당신의 사려 깊은 성격과 세심함을 담고 있습니다.`,
-      `${name}은(는) 당신의 활기찬 성격과 삶에 대한 열정을 담고 있습니다.`,
-      `${name}은(는) 당신의 지성과 창의성의 균형을 상징합니다.`,
-    ]
+      // 서버가 반환하는 JSON (ChatResponseDto)를 받는다: { name, explanation }
+      const data = await response.json()
 
-    setResult({
-      name,
-      explanation: explanations[randomIndex],
-    })
+      // state에 결과를 세팅
+      setResult({
+        name: data.name || "",
+        explanation: data.explanation || "",
+      })
+    } catch (error) {
+      console.error(error)
 
-    // Add a delay before showing result
-    setTimeout(() => {
-      addMessage("결과가 나왔어요! 🎉", "system")
-
+      // 데모용 fallback (에러 시 임시 이름)
+      setResult({
+        name: "Unknown",
+        explanation: "이름 생성 중 오류가 발생했습니다.",
+      })
+    } finally {
+      // 결과 메시지 출력 후, result 화면으로 전환
       setTimeout(() => {
-        setStep("result")
+        addMessage("결과가 나왔어요! 🎉", "system")
+
+        setTimeout(() => {
+          setStep("result")
+        }, 1000)
       }, 1000)
-    }, 1000)
+    }
   }
 
   const playAudio = () => {

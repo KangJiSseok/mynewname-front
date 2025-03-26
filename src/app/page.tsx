@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL
+
 type MessageType = {
   id: number
   sender: "system" | "user"
@@ -125,8 +127,7 @@ export default function HybridNameFinder() {
 
   const generateResult = async () => {
     try {
-      // 만약 서버가 http://localhost:8080/api/chat/generate 에서 받는다면:
-      const response = await fetch("http://localhost:8080/api/chat/generate", {
+      const response = await fetch(`${apiUrl}/api/chat/generate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

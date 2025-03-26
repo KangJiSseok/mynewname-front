@@ -1,0 +1,78 @@
+name: Next.js CI/CD
+
+# main 브랜치에 push 혹은 PR일 때 동작
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # (A) Docker 이미지 빌드 + DockerHub 푸시
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      # 1) 레포지토리 코드 체크아웃
+      - uses: actions/checkout@v4
+
+      # 2) Node 18 설정
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # 3) (선택) npm install 테스트용
+      - name: Install dependencies
+        run: npm install
+
+      # 4) Next.js 빌드(로컬 테스트용)
+      - name: Build
+        run: npm run build
+
+      # 5) Docker 빌드
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/next-cicd-test .
+
+      # 6) DockerHub 로그인
+      - name: Docker login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      # 7) Docker Hub로 push
+      - name: Docker Hub push
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/next-cicd-test
+
+  # (B) EC2 서버에서 Docker 컨테이너 실행 (Self-hosted Runner)
+  run-docker-image-on-ec2:
+    # build 잡이 끝나야 시작
+    needs: build
+    # EC2에 설치된 self-hosted Runner (Spring 때와 동일)
+    runs-on: self-hosted
+
+    steps:
+      - name: Pull image from Docker Hub
+        run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/next-cicd-test
+
+      # 기존 컨테이너가 있으면 중단
+      - name: Stop old container
+        run: |
+          if [ $(sudo docker ps -q -f name=next-cicd-test) ]; then
+            sudo docker stop next-cicd-test
+          fi
+
+      # 새로운 컨테이너 실행
+      - name: Run new container
+        run: |
+          sudo docker run --rm -d \
+            -p 3000:3000 \  # 호스트 3000번 포트로 접속 시, 컨테이너의 3000번 포트로 연결
+            --name next-cicd-test \
+            ${{ secrets.DOCKERHUB_USERNAME }}/next-cicd-test
+
+      # 사용 안 하는 이미지/컨테이너 정리
+      - name: Delete old docker images
+        run: sudo docker system prune -f

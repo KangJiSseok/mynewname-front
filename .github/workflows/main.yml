@@ -69,7 +69,7 @@ jobs:
       - name: Run new container
         run: |
           sudo docker run --rm -d \
-            -p 3000:3000 \  # 호스트 3000번 포트로 접속 시, 컨테이너의 3000번 포트로 연결
+            -p 3000:3000 \
             --name next-cicd-test \
             ${{ secrets.DOCKERHUB_USERNAME }}/next-cicd-test
 

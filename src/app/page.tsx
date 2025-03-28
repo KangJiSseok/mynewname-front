@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
-
+import Script from "next/script"
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
@@ -168,17 +168,6 @@ export default function HybridNameFinder() {
         throw new Error("서버 응답 에러")
       }
 
-      // 서버가 반환하는 JSON 예시:
-      // {
-      //   "names": ["Asher", "Finn", "Jasper"],
-      //   "reasons": {
-      //       "Asher": { "나이/시대적 유행": "...", "직업": "...", "MBTI": "..." },
-      //       "Finn": { ... },
-      //       "Jasper": { ... }
-      //   },
-      //   "namesCount": [1, 2, 1],
-      //   "totalCount": 5
-      // }
       const data = await response.json()
 
       setResult({
@@ -256,10 +245,23 @@ export default function HybridNameFinder() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 flex">
-      {/* Ad space - left side (desktop/tablet only) */}
+      {/* Left ad */}
       <div className="hidden md:block w-1/6 p-2">
         <div className="h-full border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
-          <p className="text-gray-400 text-sm text-center">광고 공간</p>
+          <div>
+            <ins
+              className="kakao_ad_area"
+              style={{ display: "none", width: "160px", height: "600px" }}
+              data-ad-unit="DAN-pzfLfwPMLrY7kXrg"
+              data-ad-width="160"
+              data-ad-height="600"
+            ></ins>
+            <Script
+              src="https://t1.daumcdn.net/kas/static/ba.min.js"
+              strategy="afterInteractive"
+              async
+            />
+          </div>
         </div>
       </div>
 
@@ -470,7 +472,6 @@ export default function HybridNameFinder() {
                     >
                       <h2 className="text-2xl font-bold text-pink-600">추천받은 이름 목록</h2>
 
-                      {/* 이름 목록과 추천 횟수, 이유를 출력 */}
                       <div className="space-y-4">
                         {result.names.map((name, index) => (
                           <div
@@ -491,7 +492,6 @@ export default function HybridNameFinder() {
                                   </li>
                                 )
                               })}
-
                             </ul>
                           </div>
                         ))}
@@ -510,6 +510,7 @@ export default function HybridNameFinder() {
                         🔍 다른 추천 이름도 보기
                       </Button>
                     </motion.div>
+
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -557,10 +558,23 @@ export default function HybridNameFinder() {
         </main>
       </div>
 
-      {/* Ad space - right side (desktop/tablet only) */}
+      {/* Right ad */}
       <div className="hidden md:block w-1/6 p-2">
         <div className="h-full border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
-          <p className="text-gray-400 text-sm text-center">광고 공간</p>
+          <div>
+            <ins
+              className="kakao_ad_area"
+              style={{ display: "none", width: "160px", height: "600px" }}
+              data-ad-unit="DAN-KzJPRPLvYVYWE0DT"
+              data-ad-width="160"
+              data-ad-height="600"
+            ></ins>
+            <Script
+              src="https://t1.daumcdn.net/kas/static/ba.min.js"
+              strategy="afterInteractive"
+              async
+            />
+          </div>
         </div>
       </div>
     </div>

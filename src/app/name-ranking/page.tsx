@@ -2,9 +2,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { motion } from "framer-motion"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL

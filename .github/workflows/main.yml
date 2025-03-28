@@ -59,16 +59,16 @@ jobs:
         run: sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/next-cicd-test
 
       # 기존 컨테이너가 있으면 중단
-      - name: Stop old container
+      - name: Remove old container if exists
         run: |
-          if [ $(sudo docker ps -q -f name=next-cicd-test) ]; then
-            sudo docker stop next-cicd-test
+          if [ $(sudo docker ps -aq -f name=next-cicd-test) ]; then
+            sudo docker rm -f next-cicd-test
           fi
 
       # 새로운 컨테이너 실행
       - name: Run new container
         run: |
-          sudo docker run --rm -d \
+          sudo docker run -d \
             -p 3000:3000 \
             --name next-cicd-test \
             ${{ secrets.DOCKERHUB_USERNAME }}/next-cicd-test

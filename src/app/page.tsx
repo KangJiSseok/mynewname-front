@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
+import { useRouter } from "next/navigation"
+
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
@@ -19,6 +21,7 @@ type MessageType = {
 }
 
 export default function HybridNameFinder() {
+  const router = useRouter()
   // Step tracking
   const [step, setStep] = useState<"form" | "chat" | "result">("form")
 
@@ -495,6 +498,18 @@ export default function HybridNameFinder() {
                       </div>
                     </motion.div>
 
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1.2, duration: 0.5 }}
+                    >
+                      <Button
+                        onClick={() => router.push("/name-ranking")}
+                        className="mt-4 w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 px-6 rounded-full text-lg flex items-center justify-center gap-2"
+                      >
+                        🔍 다른 추천 이름도 보기
+                      </Button>
+                    </motion.div>
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
